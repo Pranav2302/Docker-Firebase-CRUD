@@ -2,6 +2,12 @@
 
 A full-stack web application for managing users with CRUD operations, built with Next.js frontend and Firebase Functions backend.
 
+## 📸 Live Preview
+
+![User Management Dashboard](./public/photo.png)
+
+*Modern, responsive UI with clean design and intuitive user experience*
+
 ## 📋 Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -24,6 +30,15 @@ A full-stack web application for managing users with CRUD operations, built with
 - **Loading States**: Loading indicators for better UX
 - **Responsive Design**: Mobile-friendly interface
 - **TypeScript**: Full type safety across the application
+
+## 🎯 Key UI Features
+
+- **Modern Dashboard Layout**: Clean, professional interface with gradient backgrounds
+- **Interactive Data Table**: Sortable table with hover effects and action buttons
+- **Smart Form Design**: User-friendly forms with proper validation and feedback
+- **Alert System**: Toast notifications for success/error messages
+- **Loading States**: Smooth loading animations and skeleton screens
+- **Responsive Grid**: Adapts perfectly to different screen sizes
 
 ## 🛠 Tech Stack
 
