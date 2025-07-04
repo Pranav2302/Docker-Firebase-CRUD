@@ -5,6 +5,8 @@ import { User } from '../types/user';
 import { userService } from '../services/userService';
 import { UserForm } from '../components/userForm';
 import { UserTable } from '../components/userTable';
+import { Button } from '../../components/ui/button';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 
 export default function Dashboard() {
   const [users, setUsers] = useState<User[]>([]);
@@ -12,6 +14,15 @@ export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alert, setAlert] = useState<{
+    type: 'success' | 'error' | 'info';
+    message: string;
+  } | null>(null);
+
+  const showAlert = (type: 'success' | 'error' | 'info', message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 5000);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -24,7 +35,7 @@ export default function Dashboard() {
       setUsers(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
-      alert('Failed to fetch users');
+      showAlert('error', 'Failed to fetch users');
     } finally {
       setIsLoading(false);
     }
@@ -36,10 +47,10 @@ export default function Dashboard() {
       await userService.createUser(userData);
       setShowForm(false);
       fetchUsers();
-      alert('User created successfully!');
+      showAlert('success', 'User created successfully!');
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Failed to create user');
+      showAlert('error', 'Failed to create user');
     } finally {
       setIsSubmitting(false);
     }
@@ -54,10 +65,10 @@ export default function Dashboard() {
       setEditingUser(null);
       setShowForm(false);
       fetchUsers();
-      alert('User updated successfully!');
+      showAlert('success', 'User updated successfully!');
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Failed to update user');
+      showAlert('error', 'Failed to update user');
     } finally {
       setIsSubmitting(false);
     }
@@ -69,10 +80,10 @@ export default function Dashboard() {
     try {
       await userService.deleteUser(id);
       fetchUsers();
-      alert('User deleted successfully!');
+      showAlert('success', 'User deleted successfully!');
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
+      showAlert('error', 'Failed to delete user');
     }
   };
 
@@ -87,18 +98,47 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">User Management Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your users with full CRUD operations</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                User Management Dashboard
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Manage your users with full CRUD operations
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600">{users.length}</div>
+                <div className="text-sm text-gray-500">Total Users</div>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Alert */}
+        {alert && (
+          <div className="mb-6">
+            <Alert variant={alert.type === 'error' ? 'destructive' : 'default'}>
+              <AlertDescription>
+                {alert.message}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* Form Section */}
         {showForm ? (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingUser ? 'Edit User' : 'Create New User'}
-            </h2>
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                {editingUser ? 'Edit User' : 'Create New User'}
+              </h2>
+            </div>
             <UserForm
               user={editingUser || undefined}
               onSubmit={editingUser ? handleUpdateUser : handleCreateUser}
@@ -107,20 +147,33 @@ export default function Dashboard() {
             />
           </div>
         ) : (
-          <div className="mb-6">
-            <button
+          <div className="mb-8">
+            <Button
               onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
               Add New User
-            </button>
+            </Button>
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold">Users ({users.length})</h2>
+        {/* Table Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Users Directory
+            </h2>
+            {!isLoading && users.length > 0 && (
+              <div className="text-sm text-gray-500">
+                Showing {users.length} user{users.length !== 1 ? 's' : ''}
+              </div>
+            )}
           </div>
+          
           <UserTable
             users={users}
             onEdit={handleEdit}
